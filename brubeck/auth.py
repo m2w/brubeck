@@ -5,7 +5,7 @@
 
     2. Tools for applying auth requirements to functions, eg. decorators.
 
-    3. Mixins for adding authenticaiton handling to MessageHandler's and
+    3. Mixins for adding authentication handling to MessageHandler's and
        Document classes
 """
 
@@ -82,7 +82,7 @@ def web_authenticated(method):
 
 
 ###
-### Mixins to extend MessageHandlers with auth funcitons
+### Mixins to extend MessageHandlers with auth functions
 ###
 
 class UserHandlingMixin(object):

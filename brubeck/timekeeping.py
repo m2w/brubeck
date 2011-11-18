@@ -10,7 +10,7 @@ from dictshield.fields import LongField
 ###
 
 def curtime():
-    """This funciton is the central method for getting the current time. It
+    """This function is the central method for getting the current time. It
     represents the time in milliseconds and the timezone is UTC.
     """
     return long(time.time() * 1000)

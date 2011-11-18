@@ -133,6 +133,13 @@ def cookie_is_encoded(data):
     ''' Return True if the argument looks like a encoded cookie.'''
     return bool(data.startswith(to_bytes('!')) and to_bytes('?') in data)
 
+def serialize_cookies(cookies):
+    """Serialize cookies as part of the request header. Returns a multiline string or None
+    """
+    cookie_vals = [c.OutputString() for c in cookies.values()]
+    if len(cookie_vals) > 0:
+        return '\nSet-Cookie: '.join(cookie_vals)
+    return None
 
 ###
 ### Message handling
@@ -482,14 +489,6 @@ class WebMessageHandler(MessageHandler):
     ### Output generation
     ###
 
-    def convert_cookies(self):
-        """ Resolves cookies into multiline values.
-        """
-        cookie_vals = [c.OutputString() for c in self.cookies.values()]
-        if len(cookie_vals) > 0:
-            cookie_str = '\nSet-Cookie: '.join(cookie_vals)
-            self.headers['Set-Cookie'] = cookie_str
-
     def render(self, status_code=None, http_200=False, **kwargs):
         """Renders payload and prepares the payload for a successful HTTP
         response.
@@ -506,7 +505,8 @@ class WebMessageHandler(MessageHandler):
         if http_200:
             status_code = 200
 
-        self.convert_cookies()
+        if self.cookies:
+            self.headers['Set-Cookie'] = serialize_cookies(self.cookies)
 
         response = http_response(self.body, status_code,
                                  self.status_msg, self.headers)
@@ -526,9 +526,10 @@ class JSONMessageHandler(WebMessageHandler):
         if status_code:
             self.set_status(status_code)
 
-        self.convert_cookies()
-        
         self.headers['Content-Type'] = 'application/json'
+
+        if self.cookies:
+            self.headers['Set-Cookie'] = serialize_cookies(self.cookies)
 
         body = json.dumps(self._payload)
 
